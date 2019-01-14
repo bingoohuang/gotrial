@@ -33,9 +33,9 @@ var (
 func init() {
 	flag.IntVar(&width, "w", 640, "picture width")
 	flag.IntVar(&height, "h", 320, "picture height")
-	flag.IntVar(&seq, "s", 0, "picure sequence number")
+	flag.IntVar(&seq, "s", 0, "picture sequence number")
 	flag.IntVar(&fixMib, "m", 0, "fixed size(MiB)")
-	flag.IntVar(&many, "i", 1, "how many pictures created")
+	flag.IntVar(&many, "i", 1, "how many pictures to create")
 	flag.StringVar(&picfmt, "f", "png", "picture format(png/jpg)")
 
 	flag.Parse()
