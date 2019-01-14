@@ -1,6 +1,7 @@
 package main
 
 import (
+	"../randimg"
 	"flag"
 	"math/rand"
 	"strconv"

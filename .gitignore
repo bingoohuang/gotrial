@@ -14,9 +14,9 @@
 .DS_Store
 .idea
 *.bin
-randimg/randimg
-randimg/*.jpg
-randimg/*.png
+randimgmain/randimgmain
+randimgmain/*.jpg
+randimgmain/*.png
 pidusage/pidusage
-gossh/gossh
+gosshmain/gosshmain
 

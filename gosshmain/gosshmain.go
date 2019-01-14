@@ -1,6 +1,7 @@
 package main
 
 import (
+	"../gossh"
 	"flag"
 	"fmt"
 	"github.com/mitchellh/go-homedir"
