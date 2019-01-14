@@ -3,7 +3,8 @@ package main
 import (
 	"bytes"
 	"crypto/rand"
-	"github.com/pbnjay/pixfont"
+	"encoding/binary"
+	"flag"
 	"image"
 	"image/color"
 	"image/draw"
@@ -13,11 +14,46 @@ import (
 	mathrand "math/rand"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
+
+	"github.com/pbnjay/pixfont"
 )
 
+var (
+	width    int
+	height   int
+	filename string
+	seq      int
+	picfmt   string
+	fixMib   int
+)
+
+func init() {
+	flag.IntVar(&width, "w", 640, "picture width")
+	flag.IntVar(&height, "h", 320, "picture height")
+	flag.IntVar(&seq, "s", 0, "picure sequence number")
+	flag.IntVar(&fixMib, "m", 0, "fixed size(MiB)")
+	flag.StringVar(&picfmt, "f", "png", "picture format(png/jpg)")
+
+	flag.Parse()
+}
+
 func main() {
-	GenerateRandomImageFile(640, 320, "12345678910", "a.jpg", 5<<20)
+	var s uint64 = uint64(seq)
+	if s <= 0 {
+		mathrand.Seed(time.Now().UnixNano())
+		s = RandUint64()
+	}
+
+	randText := strconv.FormatUint(s, 10)
+	GenerateRandomImageFile(width, height, randText, randText+"."+picfmt, fixMib<<20)
+}
+
+func RandUint64() uint64 {
+	buf := make([]byte, 8)
+	mathrand.Read(buf) // Always succeeds, no need to check error
+	return binary.LittleEndian.Uint64(buf)
 }
 
 // GenerateRandomImageFile generate image file.
