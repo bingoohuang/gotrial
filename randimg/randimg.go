@@ -27,6 +27,7 @@ var (
 	seq      int
 	picfmt   string
 	fixMib   int
+	many     int
 )
 
 func init() {
@@ -34,22 +35,27 @@ func init() {
 	flag.IntVar(&height, "h", 320, "picture height")
 	flag.IntVar(&seq, "s", 0, "picure sequence number")
 	flag.IntVar(&fixMib, "m", 0, "fixed size(MiB)")
+	flag.IntVar(&many, "i", 1, "how many pictures created")
 	flag.StringVar(&picfmt, "f", "png", "picture format(png/jpg)")
 
 	flag.Parse()
 }
 
 func main() {
-	var s uint64 = uint64(seq)
+	s := uint64(seq)
 	if s <= 0 {
 		mathrand.Seed(time.Now().UnixNano())
 		s = RandUint64()
 	}
 
-	randText := strconv.FormatUint(s, 10)
-	GenerateRandomImageFile(width, height, randText, randText+"."+picfmt, fixMib<<20)
+	for i := 0; i < many; i++ {
+		randText := strconv.FormatUint(s, 10)
+		s++
+		GenerateRandomImageFile(width, height, randText, randText+"."+picfmt, fixMib<<20)
+	}
 }
 
+// RandUint64 generate a random uint64
 func RandUint64() uint64 {
 	buf := make([]byte, 8)
 	mathrand.Read(buf) // Always succeeds, no need to check error
