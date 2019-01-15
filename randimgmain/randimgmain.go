@@ -1,11 +1,12 @@
 package main
 
 import (
-	"../randimg"
 	"flag"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/bingoohuang/golang-trial/randimg"
 )
 
 var (

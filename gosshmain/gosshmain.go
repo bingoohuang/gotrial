@@ -1,14 +1,15 @@
 package main
 
 import (
-	"../gossh"
 	"flag"
 	"fmt"
-	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
+
+	"github.com/bingoohuang/golang-trial/gossh"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 var (
