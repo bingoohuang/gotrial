@@ -44,9 +44,7 @@ func GenerateRandomImage(width, height, pixelSize int, randomText, imageFormat s
 	switch imageFormat {
 	case "jpg":
 		img = image.NewNRGBA(image.Rect(0, 0, width, height))
-	case "png":
-		fallthrough
-	default:
+	default: // png
 		img = image.NewRGBA(image.Rect(0, 0, width, height))
 	}
 
@@ -67,9 +65,7 @@ func GenerateRandomImage(width, height, pixelSize int, randomText, imageFormat s
 	switch imageFormat {
 	case "jpg":
 		jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100}) // 图像质量值为100，是最好的图像显示
-	case "png":
-		fallthrough
-	default:
+	default: // png
 		png.Encode(&buf, img)
 	}
 
