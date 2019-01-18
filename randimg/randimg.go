@@ -31,6 +31,11 @@ func GenerateRandomImageFile(width, height int, randomText, fileName string, fix
 	imgbytes, imgSize := GenerateRandomImage(width, height, 20, randomText, filepath.Ext(fileName))
 	f.Write(imgbytes)
 	if fixedSize > int64(imgSize) {
+		// refer to https://stackoverflow.com/questions/16797380/how-to-create-a-10mb-file-filled-with-000000-data-in-golang
+		// use f.Truncate to change size of the file
+		// If you are using unix, then you can create a sparse file very quickly.
+		// A sparse file is filled with zero (ascii NUL) and doesn't actually take up the disk space
+		// until it is written to, but reads correctly.
 		f.Truncate(fixedSize)
 	}
 }
