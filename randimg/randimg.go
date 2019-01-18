@@ -2,14 +2,12 @@ package randimg
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/binary"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
-	"io"
 	mathrand "math/rand"
 	"os"
 	"path/filepath"
@@ -26,14 +24,14 @@ func RandUint64() uint64 {
 }
 
 // GenerateRandomImageFile generate image file.
-func GenerateRandomImageFile(width, height int, randomText, fileName string, fixedSize int) {
+func GenerateRandomImageFile(width, height int, randomText, fileName string, fixedSize int64) {
 	f, _ := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
 	defer f.Close()
 
 	imgbytes, imgSize := GenerateRandomImage(width, height, 20, randomText, filepath.Ext(fileName))
 	f.Write(imgbytes)
-	if fixedSize > imgSize { // padding to fixed size
-		io.CopyN(f, rand.Reader, int64(fixedSize-imgSize))
+	if fixedSize > int64(imgSize) {
+		f.Truncate(fixedSize)
 	}
 }
 
