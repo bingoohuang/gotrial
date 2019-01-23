@@ -19,9 +19,13 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", uiStatusHandler)
+	http.HandleFunc("/error", errorHandler)
 	http.HandleFunc("/ui/index.html", uiStatusHandler)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
+}
+
+func errorHandler(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "my own error message", http.StatusInternalServerError)
 }
 
 func uiStatusHandler(w http.ResponseWriter, r *http.Request) {
