@@ -68,12 +68,15 @@ func main() {
 	defer client.Close()
 
 	scriptLines := gossh.SplitScriptLines(scripts)
-	for _, scriptLine := range scriptLines {
-		fmt.Println(prompt, scriptLine)
-		out, err := gossh.RunScript(client, scriptLine)
-		if err != nil {
-			log.Fatalf("RunScript %s error %v", scriptLine, err)
-		}
-		fmt.Println(prompt, out)
-	}
+	out, _ := gossh.RunScripts(client, scriptLines)
+	fmt.Println(out)
+
+	//for _, scriptLine := range scriptLines {
+	//	fmt.Println(prompt, scriptLine)
+	//	out, err := gossh.RunScript(client, scriptLine)
+	//	if err != nil {
+	//		log.Fatalf("RunScript %s error %v", scriptLine, err)
+	//	}
+	//	fmt.Println(prompt, out)
+	//}
 }
