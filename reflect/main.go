@@ -36,14 +36,11 @@ func main() {
 		Used, UsedPercent           float32
 	}
 
-	var memSeries []MemSeries
 	ParseIqlResults(jso, func(m map[string]interface{}) {
 		ms := MemSeries{}
 		Map2Struct(m, &ms)
 		fmt.Printf("%+v\n", ms)
 	})
-
-	fmt.Println(memSeries)
 }
 
 // UnmarshalError return error from errMsg
