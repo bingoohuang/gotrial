@@ -2,27 +2,22 @@ package main
 
 import (
 	"flag"
-	"math/rand"
-	"strconv"
-	"time"
-
+	"fmt"
 	"github.com/bingoohuang/golang-trial/randimg"
+	"github.com/bingoohuang/gou/rand"
 )
 
 var (
-	width    int
-	height   int
-	filename string
-	seq      int
-	picfmt   string
-	fixMib   int64
-	many     int
+	width  int
+	height int
+	picfmt string
+	fixMib int64
+	many   int
 )
 
 func init() {
 	flag.IntVar(&width, "w", 640, "picture width")
 	flag.IntVar(&height, "h", 320, "picture height")
-	flag.IntVar(&seq, "s", 0, "picture sequence number")
 	flag.Int64Var(&fixMib, "m", 0, "fixed size(MiB)")
 	flag.IntVar(&many, "i", 1, "how many pictures to create")
 	flag.StringVar(&picfmt, "f", "png", "picture format(png/jpg)")
@@ -31,15 +26,14 @@ func init() {
 }
 
 func main() {
-	s := uint64(seq)
-	if s <= 0 {
-		rand.Seed(time.Now().UnixNano())
-		s = randimg.RandUint64()
-	}
+	s := rand.Int()
 
 	for i := 0; i < many; i++ {
-		randText := strconv.FormatUint(s, 10)
+		randText := fmt.Sprintf("%d", s)
 		s++
-		randimg.GenerateRandomImageFile(width, height, randText, randText+"."+picfmt, fixMib<<20)
+		fileName := fmt.Sprintf("%d.%s", s, picfmt)
+		randimg.GenerateRandomImageFile(width, height, randText, fileName, fixMib<<20)
+
+		fmt.Println(fileName, "with width", width, "height", height, "randText", randText, "generated!")
 	}
 }
