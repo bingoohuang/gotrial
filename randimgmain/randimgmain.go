@@ -29,8 +29,7 @@ func main() {
 	s := rand.Int()
 
 	for i := 0; i < many; i++ {
-		randText := fmt.Sprintf("%d", s)
-		s++
+		randText := fmt.Sprintf("%d", s+i)
 		fileName := fmt.Sprintf("%d.%s", s, picfmt)
 		randimg.GenerateRandomImageFile(width, height, randText, fileName, fixMib<<20)
 
