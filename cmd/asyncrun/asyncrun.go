@@ -1,9 +1,9 @@
-package main
+package asyncrun
 
 import (
 	"bytes"
-	"runtime/debug"
 	"fmt"
+	"runtime/debug"
 	"sync"
 )
 
@@ -27,7 +27,7 @@ func RunAsyncAllowErrors(functions ...GenericFunction) []error {
 				// 2) formatStack()
 				// 3) this anonymous func
 				// 4) runtime/panic
-				errors[j] = fmt.Errorf( "panic in async function: %v\n%s", r, formatStack(4))
+				errors[j] = fmt.Errorf("panic in async function: %v\n%s", r, formatStack(4))
 			}
 		}()
 		errors[j] = functions[j]()
@@ -47,7 +47,6 @@ func formatStack(skip int) string {
 	return string(formatted)
 }
 
-
 func makeRequest(url string) GenericFunction {
 	return func() error {
 		panic(url)
@@ -55,7 +54,7 @@ func makeRequest(url string) GenericFunction {
 	}
 }
 
-func  main() {
+func main() {
 	funcs := []GenericFunction{
 		makeRequest("http://abc.com"),
 		makeRequest("http://def.com"),

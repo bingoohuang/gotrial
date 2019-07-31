@@ -42,7 +42,7 @@ type Foo struct {
 	a int
 }
 
-var commentFinalizer *bool
+var commentFinalizer *bool // nolint
 
 func init() {
 	commentFinalizer = flag.Bool("c", false, "commented finalizer")

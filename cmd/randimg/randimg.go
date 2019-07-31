@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/bingoohuang/golang-trial/randimg"
 	"github.com/bingoohuang/gou/rand"
 )

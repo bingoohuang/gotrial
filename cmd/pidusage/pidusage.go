@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/struCoder/pidusage"
 	"log"
 	"os"
 	"time"
+
+	"github.com/struCoder/pidusage"
 )
 
 var (

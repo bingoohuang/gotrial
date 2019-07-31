@@ -7,39 +7,41 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"time"
 
 	"github.com/bingoohuang/golang-trial/gossh"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 )
 
-var (
+type App struct {
 	usr      string
 	host     string
 	port     int
 	scripts  string
 	password string
 	prompt   string
-)
+}
 
-func init() {
+func createApp() App {
 	var scriptsFile string
+	var app App
 
-	flag.StringVar(&usr, "u", "", "user, default to current user")
-	flag.StringVar(&host, "h", "", "host")
-	flag.StringVar(&scripts, "s", "", "scripts string")
-	flag.StringVar(&password, "P", "", "password")
-	flag.StringVar(&prompt, "t", ">", "prompt tip")
+	flag.StringVar(&app.usr, "u", "", "user, default to current user")
+	flag.StringVar(&app.host, "h", "", "host")
+	flag.StringVar(&app.scripts, "s", "", "scripts string")
+	flag.StringVar(&app.password, "P", "", "password")
+	flag.StringVar(&app.prompt, "t", ">", "prompt tip")
 	flag.StringVar(&scriptsFile, "f", "", "scripts file")
-	flag.IntVar(&port, "p", 22, "port")
+	flag.IntVar(&app.port, "p", 22, "port")
 
 	flag.Parse()
 
-	if usr == "" {
+	if app.usr == "" {
 		current, _ := user.Current()
-		usr = current.Username
+		app.usr = current.Username
 	}
 
-	if host == "" {
+	if app.host == "" {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(os.Stderr, "host argument missed\n")
@@ -52,24 +54,34 @@ func init() {
 		if err != nil {
 			log.Fatalf("unable to read scripts file: %v", err)
 		}
-		scripts = string(s)
+		app.scripts = string(s)
 	}
 
-	if scripts == "" {
-		scripts = "uname -a"
+	if app.scripts == "" {
+		app.scripts = "uname -a"
 	}
+
+	return app
 }
 
 func main() {
-	client, err := gossh.CreateClient(usr, host, port, password)
+	app := createApp()
+	client, err := gossh.CreateClient(app.host, app.port, app.usr, app.password)
 	if err != nil {
 		log.Fatalf("unable to connect: %v", err)
 	}
 	defer client.Close()
 
-	scriptLines := gossh.SplitScriptLines(scripts)
-	out, _ := gossh.RunScripts(client, scriptLines)
+	fmt.Println("connected")
+	start := time.Now()
+
+	scriptLines := gossh.SplitScriptLines(app.scripts)
+	out, err := gossh.RunScripts(client, scriptLines)
+	fmt.Println("cost:", time.Since(start).String())
 	fmt.Println(out)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
 
 	//for _, scriptLine := range scriptLines {
 	//	fmt.Println(prompt, scriptLine)

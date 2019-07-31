@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/mitchellh/go-homedir"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"net"
 	"os"
@@ -13,13 +11,16 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/mitchellh/go-homedir"
+	"golang.org/x/crypto/ssh"
 )
 
 // CreateClient with user(optional), host, port and password(optional)
 // https://stackoverflow.com/questions/35450430/how-to-increase-golang-org-x-crypto-ssh-verbosity
 // As a quick hack you can open $GOPATH/golang.org/x/crypto/ssh/mux.go file,
 // change const debugMux = false to const debugMux = true and recompile your program.
-func CreateClient(user, host string, port int, password string) (*ssh.Client, error) {
+func CreateClient(host string, port int, user, password string) (*ssh.Client, error) {
 	auth, err := createAuth(password)
 	if err != nil {
 		return nil, err
@@ -29,7 +30,7 @@ func CreateClient(user, host string, port int, password string) (*ssh.Client, er
 		User:            user,
 		Timeout:         3 * time.Second,
 		Auth:            []ssh.AuthMethod{auth},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // nolint
 	}
 
 	// Connect to the remote server and perform the SSH handshake.
@@ -79,7 +80,7 @@ func createAuth(password string) (ssh.AuthMethod, error) {
 		return ssh.Password(password), nil
 	}
 
-	auth, err := CreatePublickKey()
+	auth, err := CreatePublicKey()
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +91,8 @@ func createAuth(password string) (ssh.AuthMethod, error) {
 	return nil, errors.New("please use password or auto ssh by ~/.ssh/id_rsa")
 }
 
-// CreatePublickKey from ~/.ssh/id_rs
-func CreatePublickKey() (ssh.AuthMethod, error) {
+// CreatePublicKey from ~/.ssh/id_rs
+func CreatePublicKey() (ssh.AuthMethod, error) {
 	file, _ := homedir.Expand("~/.ssh/id_rsa")
 
 	if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -158,19 +159,20 @@ func RunScripts(client *ssh.Client, scripts []string) (string, error) {
 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
-	err = session.RequestPty("vt100", 800, 400, modes)
+	if err := session.RequestPty("vt100", 800, 400, modes); err != nil {
+		return "", err
+	}
+	w, err := session.StdinPipe()
 	if err != nil {
 		return "", err
 	}
-	w, _ := session.StdinPipe()
 
 	var b singleWriter
 	session.Stdout = &b
 	session.Stderr = &b
 
-	err = session.Shell()
-	if err != nil {
-		return "", err
+	if err := session.Shell(); err != nil {
+		return b.b.String(), err
 	}
 
 	hasExit := false
@@ -185,7 +187,9 @@ func RunScripts(client *ssh.Client, scripts []string) (string, error) {
 	if !hasExit {
 		_, _ = w.Write([]byte("exit\n"))
 	}
-	_ = session.Wait()
+	if err := session.Wait(); err != nil {
+		return b.b.String(), err
+	}
 
 	return b.b.String(), err
 }
@@ -200,12 +204,13 @@ func SplitScriptLines(scripts string) []string {
 			continue
 		}
 
-		if strings.HasSuffix(line, "\\") {
+		switch {
+		case strings.HasSuffix(line, "\\"):
 			lastLine += line[:len(line)-1]
-		} else if lastLine != "" {
+		case lastLine != "":
 			scriptLines = append(scriptLines, lastLine+line)
 			lastLine = ""
-		} else {
+		default:
 			scriptLines = append(scriptLines, trimLine)
 		}
 	}
