@@ -2,10 +2,12 @@ package gossh
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -31,12 +33,44 @@ func CreateClient(user, host string, port int, password string) (*ssh.Client, er
 	}
 
 	// Connect to the remote server and perform the SSH handshake.
-	client, err := ssh.Dial("tcp", host+":"+strconv.Itoa(port), config)
+	client, err := Dial("tcp", host+":"+strconv.Itoa(port), config)
 	if err != nil {
 		return nil, err
 	}
 
 	return client, nil
+}
+
+type Dialer func(ctx context.Context, net, addr string) (c net.Conn, err error)
+
+// TimeoutDialer returns functions of connection dialer with timeout settings for http.Transport Dial field.
+func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) Dialer {
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+		conn, err := net.DialTimeout(network, addr, cTimeout)
+		if err != nil {
+			return conn, err
+		}
+		err = conn.SetDeadline(time.Now().Add(rwTimeout))
+		return conn, err
+	}
+}
+
+// Dial starts a client connection to the given SSH server. It is a
+// convenience function that connects to the given network address,
+// initiates the SSH handshake, and then sets up a Client.  For access
+// to incoming channels and requests, use net.Dial with NewClientConn
+// instead.
+func Dial(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	dialer := TimeoutDialer(3*time.Second, 3*time.Second)
+	conn, err := dialer(context.Background(), network, addr)
+	if err != nil {
+		return nil, err
+	}
+	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
+	if err != nil {
+		return nil, err
+	}
+	return ssh.NewClient(c, chans, reqs), nil
 }
 
 func createAuth(password string) (ssh.AuthMethod, error) {
@@ -53,7 +87,7 @@ func createAuth(password string) (ssh.AuthMethod, error) {
 		return auth, nil
 	}
 
-	return nil, errors.New("Please use password or auto sshed by ~/.ssh/id_rsa")
+	return nil, errors.New("please use password or auto ssh by ~/.ssh/id_rsa")
 }
 
 // CreatePublickKey from ~/.ssh/id_rs
