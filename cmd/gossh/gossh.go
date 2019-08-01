@@ -76,7 +76,7 @@ func main() {
 	start := time.Now()
 
 	scriptLines := gossh.SplitScriptLines(app.scripts)
-	out, err := gossh.RunScripts(client, scriptLines)
+	out, err := gossh.RunScripts(client, scriptLines, gossh.AutoExitOn)
 	fmt.Println("cost:", time.Since(start).String())
 	fmt.Println(out)
 	if err != nil {

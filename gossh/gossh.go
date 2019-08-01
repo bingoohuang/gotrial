@@ -143,7 +143,12 @@ func (w *singleWriter) Write(p []byte) (int, error) {
 	return w.b.Write(p)
 }
 
-func RunScripts(client *ssh.Client, scripts []string) (string, error) {
+type AutoExitMode bool
+
+const AutoExitOn AutoExitMode = true
+const AutoExitOff AutoExitMode = false
+
+func RunScripts(client *ssh.Client, scripts []string, autoExit AutoExitMode) (string, error) {
 	if len(scripts) == 0 {
 		return "", nil
 	}
@@ -175,18 +180,13 @@ func RunScripts(client *ssh.Client, scripts []string) (string, error) {
 		return b.b.String(), err
 	}
 
-	hasExit := false
 	for _, cmd := range scripts {
 		_, _ = w.Write([]byte(cmd + "\n"))
-
-		if !hasExit && cmd == "exit" {
-			hasExit = true
-		}
 	}
-
-	if !hasExit {
+	if autoExit == AutoExitOn {
 		_, _ = w.Write([]byte("exit\n"))
 	}
+
 	if err := session.Wait(); err != nil {
 		return b.b.String(), err
 	}
