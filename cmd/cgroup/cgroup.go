@@ -86,7 +86,9 @@ func startCmd(command, memoryPath string) {
 			options.Signal = status.Signal()
 		}
 
-		cmd.Process.Kill()
+		if err := cmd.Process.Kill(); err != nil {
+			logrus.Infoln("cmd.Process.Kill error:", err)
+		}
 
 		restart <- options
 	}
