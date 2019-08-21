@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bingoohuang/golang-trial/randimg"
-	"github.com/bingoohuang/gou/rand"
+	"github.com/bingoohuang/gou/ran"
 )
 
 var (
@@ -27,7 +27,7 @@ func init() {
 }
 
 func main() {
-	s := rand.Int()
+	s := ran.Int()
 
 	for i := 0; i < many; i++ {
 		randText := fmt.Sprintf("%d", s+i)

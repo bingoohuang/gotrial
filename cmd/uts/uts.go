@@ -100,27 +100,27 @@ func child3() {
 	cmd.Stderr = os.Stderr
 	check(Sethostname("newhost"))
 	/*
-	https://kasheemlew.github.io/2017/09/02/build-container-with-go/：
-	
-	下面获取一个unix文件系统，可以选择docker的busybox镜像，并将其导出。
+		https://kasheemlew.github.io/2017/09/02/build-container-with-go/：
 
-	docker pull busybox
-	docker run -d busybox top -b
-	此时获得刚刚的容器的containerID，然后执行
+		下面获取一个unix文件系统，可以选择docker的busybox镜像，并将其导出。
 
-	docekr export -o busybox.tar <刚才容器的ID>
-	即可在当前目录下得到一个busybox的压缩包，用
+		docker pull busybox
+		docker run -d busybox top -b
+		此时获得刚刚的容器的containerID，然后执行
 
-	mkdir busybox
-	tar -xf busybox.tar -C busybox/
-	解压即可得到我们需要的文件系统
+		docekr export -o busybox.tar <刚才容器的ID>
+		即可在当前目录下得到一个busybox的压缩包，用
 
-	查看一下busybox目录
+		mkdir busybox
+		tar -xf busybox.tar -C busybox/
+		解压即可得到我们需要的文件系统
 
-	$ ls busybox
-	bin  dev  etc  home  proc  root  sys  tmp  usr  var
+		查看一下busybox目录
 
-	 */
+		$ ls busybox
+		bin  dev  etc  home  proc  root  sys  tmp  usr  var
+
+	*/
 	check(syscall.Chroot("busybox"))
 	check(os.Chdir("/"))
 	// func Mount(source string, target string, fstype string, flags uintptr, data string) (err error)
