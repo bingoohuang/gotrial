@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 
@@ -14,21 +15,27 @@ import (
 )
 
 var (
-	port int
+	port  int
+	pport int
+	print bool
 )
 
 func init() {
 	flag.IntVar(&port, "p", 8800, "listen port")
+	flag.IntVar(&port, "pp", 0, "pprof port")
+	flag.BoolVar(&print, "print", false, "print sth")
 
 	flag.Parse()
 }
 
 func main() {
-	go func() {
-		if err := http.ListenAndServe(":6060", nil); err != nil {
-			logrus.Fatalf("error %v", err)
-		}
-	}()
+	if pport > 0 {
+		go func() {
+			if err := http.ListenAndServe(fmt.Sprintf(":%d", pport), nil); err != nil {
+				logrus.Fatalf("error %v", err)
+			}
+		}()
+	}
 
 	http.HandleFunc("/say", sayHandler)
 	http.HandleFunc("/hello", helloHandler)
@@ -42,7 +49,10 @@ func errorHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sayHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, say I love you!")
+	fmt.Fprintf(w, "Hi there, say I love you! port %d, pport %d", port, pport)
+	if print {
+		fmt.Fprintf(os.Stdout, "Hi there, say I love you! port %d, pport %d\n", port, pport)
+	}
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
