@@ -41,7 +41,10 @@ func main() {
 	http.HandleFunc("/hello", helloHandler)
 	http.HandleFunc("/error", errorHandler)
 	http.HandleFunc("/ui/index.html", uiStatusHandler)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
+	addr := ":" + strconv.Itoa(port)
+	server := &http.Server{Addr: addr}
+	server.SetKeepAlivesEnabled(false)
+	log.Fatal(server.ListenAndServe())
 }
 
 func errorHandler(w http.ResponseWriter, r *http.Request) {
