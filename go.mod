@@ -1,6 +1,6 @@
 module github.com/bingoohuang/golang-trial
 
-go 1.12
+go 1.13
 
 require (
 	github.com/bingoohuang/gou v0.0.0-20190724062522-59c35e658334
@@ -12,7 +12,8 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/struCoder/pidusage v0.1.2
-	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
-	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
+	github.com/thinkeridea/go-extend v1.1.0
+	golang.org/x/crypto v0.0.0-20191106202628-ed6320f186d4
+	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
