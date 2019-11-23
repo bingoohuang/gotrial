@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/bingoohuang/golang-trial/gossh"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 type App struct {

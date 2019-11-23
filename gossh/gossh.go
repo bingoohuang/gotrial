@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh"
 )
 
