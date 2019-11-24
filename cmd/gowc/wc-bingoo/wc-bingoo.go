@@ -13,7 +13,6 @@ func main() {
 	}
 
 	filePath := os.Args[1]
-
 	fileStat, err := os.Stat(filePath)
 	if err != nil {
 		panic(err)
@@ -21,7 +20,6 @@ func main() {
 	fileSize := int(fileStat.Size())
 
 	counts := make(chan Count)
-
 	numWorkers := runtime.NumCPU()
 	workerSize := fileSize / numWorkers
 
@@ -32,14 +30,12 @@ func main() {
 			endSize = fileSize
 		}
 
-		go FileReaderCounter(filePath, counts, startSize, endSize)
+		go FileReaderCounter(filePath, counts, startSize-1, endSize)
 	}
 
 	totalCount := Count{}
 	for i := 0; i < numWorkers; i++ {
-		count := <-counts
-		totalCount.LineCount += count.LineCount
-		totalCount.WordCount += count.WordCount
+		totalCount.Add(<-counts)
 	}
 	close(counts)
 
@@ -53,32 +49,28 @@ func FileReaderCounter(filePath string, counts chan Count, startSize, endSize in
 	}
 	defer file.Close()
 
-	countBytes := endSize - startSize
 	if startSize > 0 {
-		if _, err := file.Seek(int64(startSize-1), io.SeekStart); err != nil {
+		if _, err := file.Seek(int64(startSize), io.SeekStart); err != nil {
 			log.Fatal(err)
 		}
-		countBytes++
 	}
 
 	const bufferSize = 16 * 1024
 	buffer := make([]byte, bufferSize)
 	totalCount := Count{}
-
 	lastCharIsSpace := false
 
+	countBytes := endSize - startSize
 	for readBytes := 0; readBytes < countBytes; {
 		bytes, err := file.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
+		if err == io.EOF {
+			break
+		} else if err != nil {
 			panic(err)
 		}
 
 		bufferStart := 0
-		if readBytes == 0 && startSize > 0 {
+		if readBytes == 0 {
 			bufferStart = 1
 			lastCharIsSpace = IsSpace(buffer[0])
 		}
@@ -88,11 +80,8 @@ func FileReaderCounter(filePath string, counts chan Count, startSize, endSize in
 			bytes -= readBytes - countBytes
 		}
 
-		count := GetCount(lastCharIsSpace, buffer[bufferStart:bytes])
+		totalCount.Add(GetCount(lastCharIsSpace, buffer[bufferStart:bytes]))
 		lastCharIsSpace = IsSpace(buffer[bytes-1])
-
-		totalCount.LineCount += count.LineCount
-		totalCount.WordCount += count.WordCount
 	}
 
 	counts <- totalCount
@@ -101,6 +90,11 @@ func FileReaderCounter(filePath string, counts chan Count, startSize, endSize in
 type Count struct {
 	LineCount int
 	WordCount int
+}
+
+func (c *Count) Add(count Count) {
+	c.LineCount += count.LineCount
+	c.WordCount += count.WordCount
 }
 
 func GetCount(prevCharIsSpace bool, buffer []byte) (count Count) {
