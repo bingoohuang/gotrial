@@ -47,6 +47,7 @@ $ gtime -f "%es %MKB" wc 1g.txt
 |2 chunks|0.22s 1780KB|2.19s 1788KB|
 |3 channel|0.06s 6948KB|0.48s 8500KB|
 |4 mutex|0.04s 2436KB|0.32s 2432KB|
+|5 bingoo|0.03s 2648KB|0.24s 2668KB|
 
 
 ## codes lines statistics from [tokei](https://github.com/XAMPPRocky/tokei)

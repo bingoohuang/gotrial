@@ -2,32 +2,37 @@ package main
 
 import (
 	"io"
+	"log"
 	"os"
 	"runtime"
-	"sync"
 )
 
 func main() {
 	if len(os.Args) < 2 {
 		panic("no file path specified")
 	}
+
 	filePath := os.Args[1]
 
-	file, err := os.Open(filePath)
+	fileStat, err := os.Stat(filePath)
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	fileSize := int(fileStat.Size())
 
-	fileReader := &FileReader{
-		File:            file,
-		LastCharIsSpace: true,
-	}
 	counts := make(chan Count)
 
 	numWorkers := runtime.NumCPU()
+	workerSize := fileSize / numWorkers
+
 	for i := 0; i < numWorkers; i++ {
-		go FileReaderCounter(fileReader, counts)
+		startSize := i * workerSize
+		endSize := startSize + workerSize
+		if endSize > fileSize {
+			endSize = fileSize
+		}
+
+		go FileReaderCounter(filePath, counts, startSize, endSize)
 	}
 
 	totalCount := Count{}
@@ -38,45 +43,32 @@ func main() {
 	}
 	close(counts)
 
-	fileStat, err := file.Stat()
+	println(totalCount.LineCount, totalCount.WordCount, fileSize, fileStat.Name())
+}
+
+func FileReaderCounter(filePath string, counts chan Count, startSize, endSize int) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
 	}
-	byteCount := fileStat.Size()
+	defer file.Close()
 
-	println(totalCount.LineCount, totalCount.WordCount, byteCount, file.Name())
-}
-
-type FileReader struct {
-	File            *os.File
-	LastCharIsSpace bool
-	sync.Mutex
-}
-
-func (fileReader *FileReader) ReadChunk(buffer []byte) (Chunk, error) {
-	fileReader.Lock()
-
-	bytes, err := fileReader.File.Read(buffer)
-	if err != nil {
-		fileReader.Unlock()
-		return Chunk{}, err
+	countBytes := endSize - startSize
+	if startSize > 0 {
+		if _, err := file.Seek(int64(startSize-1), io.SeekStart); err != nil {
+			log.Fatal(err)
+		}
+		countBytes++
 	}
 
-	lastCharIsSpace := fileReader.LastCharIsSpace
-	fileReader.LastCharIsSpace = IsSpace(buffer[bytes-1])
-	fileReader.Unlock()
-
-	chunk := Chunk{lastCharIsSpace, buffer[:bytes]}
-	return chunk, nil
-}
-
-func FileReaderCounter(fileReader *FileReader, counts chan Count) {
 	const bufferSize = 16 * 1024
 	buffer := make([]byte, bufferSize)
 	totalCount := Count{}
 
-	for {
-		chunk, err := fileReader.ReadChunk(buffer)
+	lastCharIsSpace := false
+
+	for readBytes := 0; readBytes < countBytes; {
+		bytes, err := file.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -85,7 +77,20 @@ func FileReaderCounter(fileReader *FileReader, counts chan Count) {
 			panic(err)
 		}
 
-		count := GetCount(chunk)
+		bufferStart := 0
+		if readBytes == 0 && startSize > 0 {
+			bufferStart = 1
+			lastCharIsSpace = IsSpace(buffer[0])
+		}
+
+		readBytes += bytes
+		if readBytes > countBytes {
+			bytes -= readBytes - countBytes
+		}
+
+		count := GetCount(lastCharIsSpace, buffer[bufferStart:bytes])
+		lastCharIsSpace = IsSpace(buffer[bytes-1])
+
 		totalCount.LineCount += count.LineCount
 		totalCount.WordCount += count.WordCount
 	}
@@ -93,38 +98,33 @@ func FileReaderCounter(fileReader *FileReader, counts chan Count) {
 	counts <- totalCount
 }
 
-type Chunk struct {
-	PrevCharIsSpace bool
-	Buffer          []byte
-}
-
 type Count struct {
 	LineCount int
 	WordCount int
 }
 
-func GetCount(chunk Chunk) Count {
-	count := Count{}
-
-	prevCharIsSpace := chunk.PrevCharIsSpace
-	for _, b := range chunk.Buffer {
-		switch b {
-		case '\n':
-			count.LineCount++
-			prevCharIsSpace = true
-		case ' ', '\t', '\r', '\v', '\f':
-			prevCharIsSpace = true
-		default:
-			if prevCharIsSpace {
-				prevCharIsSpace = false
-				count.WordCount++
+func GetCount(prevCharIsSpace bool, buffer []byte) (count Count) {
+	for _, b := range buffer {
+		if IsSpace(b) {
+			if b == '\n' {
+				count.LineCount++
 			}
+
+			prevCharIsSpace = true
+		} else if prevCharIsSpace {
+			prevCharIsSpace = false
+			count.WordCount++
 		}
 	}
 
-	return count
+	return
 }
 
 func IsSpace(b byte) bool {
-	return b == ' ' || b == '\t' || b == '\n' || b == '\r' || b == '\v' || b == '\f'
+	switch b {
+	case ' ', '\t', '\r', '\v', '\f', '\n':
+		return true
+	default:
+		return false
+	}
 }
