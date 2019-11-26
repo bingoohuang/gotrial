@@ -3,6 +3,7 @@ module github.com/bingoohuang/golang-trial
 go 1.13
 
 require (
+	github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af
 	github.com/bingoohuang/gou v0.0.0-20190724062522-59c35e658334
 	github.com/dustin/go-humanize v1.0.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
