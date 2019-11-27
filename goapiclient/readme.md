@@ -1,0 +1,1 @@
+From [GoGoConf 2019](https://blog.aseure.fr/talks/) / [Developing a Go API client - The do's and don'ts / Anthony Seure @aseure @algolia](https://www.dropbox.com/s/2p0wqjinxjiu2ln/presentation.pdf?dl=0)
