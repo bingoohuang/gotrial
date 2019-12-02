@@ -11,10 +11,11 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pbnjay/pixfont v0.0.0-20190130005054-401bb7c6aee2
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.4.0 // indirect
+	github.com/stretchr/testify v1.4.0
 	github.com/struCoder/pidusage v0.1.2
 	github.com/thinkeridea/go-extend v1.1.0
 	golang.org/x/crypto v0.0.0-20191106202628-ed6320f186d4
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
 	golang.org/x/text v0.3.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
