@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	sshlib "github.com/blacknon/go-sshlib"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -14,14 +13,12 @@ import (
 
 var (
 	// Proxy ssh server
-	host1     = "192.168.27.3"
-	port1     = "60022"
+	host1     = "192.168.27.3:60022"
 	user1     = "huangjinbing"
 	password1 = "Df5941B81A85#"
 
 	// Target ssh server
-	host2     = "192.168.29.11"
-	port2     = "22"
+	host2     = "192.168.29.11:22"
 	user2     = "footstone"
 	password2 = ""
 
@@ -30,18 +27,13 @@ var (
 
 // https://godoc.org/github.com/blacknon/go-sshlib
 func main() {
-	// ==========
-	// proxy connect
-	// ==========
-
-	// Create proxy sshlib.Connect
-	proxyCon := &sshlib.Connect{}
+	proxyCon := &Connect{}
 
 	// Create proxy ssh.AuthMethod
-	proxyAuthMethod := sshlib.CreateAuthMethodPassword(password1)
+	proxyAuthMethod := PasswordKey(user1, password1, 0)
 
 	// Connect proxy server
-	err := proxyCon.CreateClient(host1, port1, user1, []ssh.AuthMethod{proxyAuthMethod})
+	err := proxyCon.CreateClient(host1, proxyAuthMethod)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -52,24 +44,21 @@ func main() {
 	// ==========
 
 	// Create target sshlib.Connect
-	targetCon := &sshlib.Connect{
+	targetCon := &Connect{
 		ProxyDialer: proxyCon.Client,
 	}
 
 	// Create target ssh.AuthMethod
-	targetAuthMethod := sshlib.CreateAuthMethodPassword(password2)
+	targetAuthMethod := PasswordKey(user2, password2, 0)
 
 	// Connect target server
-	err = targetCon.CreateClient(host2, port2, user2, []ssh.AuthMethod{targetAuthMethod})
+	err = targetCon.CreateClient(host2, targetAuthMethod)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	// Set terminal log
-	targetCon.SetLog(termlog, false)
-
-	session, err := targetCon.CreateSession()
+	session, err := targetCon.Client.NewSession()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
