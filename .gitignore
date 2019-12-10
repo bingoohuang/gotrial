@@ -20,3 +20,5 @@ randimgmain/*.png
 pidusage/pidusage
 gosshmain/gosshmain
 httpd/httpd
+/test_term.log
+/out.txt

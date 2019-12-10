@@ -5,7 +5,9 @@ go 1.13
 require (
 	github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af
 	github.com/bingoohuang/gou v0.0.0-20190724062522-59c35e658334
+	github.com/blacknon/go-sshlib v0.1.1
 	github.com/dustin/go-humanize v1.0.0
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
@@ -15,6 +17,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/struCoder/pidusage v0.1.2
 	github.com/thinkeridea/go-extend v1.1.0
+	github.com/youtube/vitess v2.1.1+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20191106202628-ed6320f186d4
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect

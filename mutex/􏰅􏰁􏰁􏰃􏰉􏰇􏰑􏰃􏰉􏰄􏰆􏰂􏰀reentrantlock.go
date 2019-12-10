@@ -1,9 +1,10 @@
 package mutex
 
 import (
-	"github.com/petermattis/goid"
 	"sync"
 	"sync/atomic"
+
+	"github.com/petermattis/goid"
 )
 
 type RecursiveMutex struct {

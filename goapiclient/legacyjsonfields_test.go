@@ -1,9 +1,10 @@
 package goapiclient_test
 
 import (
+	"testing"
+
 	"github.com/bingoohuang/golang-trial/goapiclient"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestContact_UnmarshalJSON(t *testing.T) {
