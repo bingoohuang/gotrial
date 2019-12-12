@@ -58,9 +58,7 @@ func (o *Once2) doSlow(f func()) {
 	o.m.Lock()
 	defer o.m.Unlock()
 	if o.done == 0 {
-		defer func() {
-			o.done = 1
-		}()
+		defer func() { o.done = 1 }()
 		f()
 	}
 }
