@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af
-	github.com/bingoohuang/gou v0.0.0-20191210032910-89ce8fa94fa2
+	github.com/bingoohuang/gou v0.0.0-20200225004418-9b3655665c46
 	github.com/dustin/go-humanize v1.0.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
@@ -19,5 +19,4 @@ require (
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
 	golang.org/x/text v0.3.2
-	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
