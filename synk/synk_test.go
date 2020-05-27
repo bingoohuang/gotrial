@@ -3,8 +3,10 @@ package synk_test
 import "testing"
 
 func TestSync(t *testing.T) {
-	var msg string
-	var done bool = false
+	var (
+		msg  string
+		done bool
+	)
 
 	go func() {
 		msg = "hello, world"

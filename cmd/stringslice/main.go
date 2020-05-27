@@ -13,5 +13,4 @@ func main() {
 
 	rs := []rune(s)
 	fmt.Println(string(rs[1:4]))
-
 }

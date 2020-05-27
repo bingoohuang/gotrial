@@ -32,6 +32,7 @@ func main() {
 	for {
 		buffer := make([]byte, bufferSize)
 		bytes, err := file.Read(buffer)
+
 		if err != nil {
 			if err == io.EOF {
 				break

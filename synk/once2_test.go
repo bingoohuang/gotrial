@@ -1,8 +1,9 @@
 package synk_test
 
 import (
-	. "github.com/bingoohuang/golang-trial/synk"
 	"testing"
+
+	. "github.com/bingoohuang/golang-trial/synk"
 )
 
 type one2 int
@@ -24,6 +25,7 @@ func TestOnce2(t *testing.T) {
 	once2 := new(Once2)
 	c := make(chan bool)
 	const N = 10
+
 	for i := 0; i < N; i++ {
 		go run2(t, once2, o2, c)
 	}

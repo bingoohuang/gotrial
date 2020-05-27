@@ -1,8 +1,9 @@
 package synk_test
 
 import (
-	. "github.com/bingoohuang/golang-trial/synk"
 	"testing"
+
+	. "github.com/bingoohuang/golang-trial/synk"
 )
 
 type one int

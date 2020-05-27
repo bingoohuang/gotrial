@@ -19,6 +19,7 @@ func Decorate(impl interface{}) interface{} {
 	inner := func(in []reflect.Value) []reflect.Value {
 		f := reflect.ValueOf(impl)
 		fmt.Println("before")
+
 		defer func(t time.Time) {
 			fmt.Printf("--- Time Elapsed (%s): %v ---\n",
 				getFunctionName(impl), time.Since(t))

@@ -44,6 +44,7 @@ func GenerateRandomImageFile(width, height int, randomText, fileName string, fix
 // refer: https://onlinejpgtools.com/generate-random-jpg
 func GenerateRandomImage(width, height, pixelSize int, randomText, imageFormat string) ([]byte, int) {
 	var img draw.Image
+
 	switch imageFormat {
 	case "jpg":
 		img = image.NewNRGBA(image.Rect(0, 0, width, height))
