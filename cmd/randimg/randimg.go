@@ -45,7 +45,7 @@ func main() {
 		fileName := fmt.Sprintf("%d.%s", s, picfmt)
 		randimg.GenerateRandomImageFile(width, height, randText, fileName, int64(fixedSize))
 
-		fmt.Println(fileName, "with width", width, "height", height, "randText", randText,
-			"fixedSize", humanize.IBytes(fixedSize), "generated!")
+		fmt.Println(fileName, "with ", width, "x", height, "randText", randText,
+			"size", humanize.IBytes(fixedSize), "generated!")
 	}
 }
