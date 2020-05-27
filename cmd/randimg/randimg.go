@@ -39,10 +39,11 @@ func init() {
 }
 
 func main() {
+	s := ran.Int()
+
 	for i := 0; i < many; i++ {
-		s := ran.Int()
 		randText := fmt.Sprintf("%d", s+i)
-		fileName := fmt.Sprintf("%d.%s", s, picfmt)
+		fileName := fmt.Sprintf("%d.%s", s+i, picfmt)
 		randimg.GenerateRandomImageFile(width, height, randText, fileName, int64(fixedSize))
 
 		fmt.Println(fileName, "with ", width, "x", height, "randText", randText,
