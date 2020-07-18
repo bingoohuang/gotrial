@@ -48,22 +48,23 @@ func (d *DynamicTicker) ChangeInterval(newInterval time.Duration) {
 
 // start 开始周期性运行任务.
 func (d *DynamicTicker) start(interval time.Duration, fn func(time.Time)) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
+	timer := time.NewTimer(interval)
+	defer timer.Stop()
 
-	log.Println("滴答要开始干活了，初始间隔为", interval)
+	log.Println("滴答开始，初始间隔为", interval)
 
 	for {
 		select {
-		case t := <-ticker.C:
-			log.Println("滴答，时间到", t.Format(Format))
+		case t := <-timer.C:
+			log.Println("滴答滴答，时间到", t.Format(Format))
 			go fn(t)
+			timer.Reset(interval)
 		case ic := <-d.IntervalChange:
-			log.Println("收到，滴答间隔调整为", ic)
+			log.Println("滴答收到，间隔调整为", ic)
 			// Stop does not close the channel, to prevent a concurrent goroutine
 			// reading from the channel from seeing an erroneous "tick".
-			ticker.Stop()
-			ticker = time.NewTicker(ic)
+			interval = ic
+			timer.Reset(interval)
 		}
 	}
 }
