@@ -13,14 +13,16 @@ func main() {
 	fmt.Println("Hello World")
 
 	t := NewDynamicTicker(10*time.Second, func(tickTime time.Time) {
-		log.Println("业务代码，执行回调 ticked = ", tickTime.Format(Format))
+		log.Println("<-- 业务代码，热🔥干活", tickTime.Format(Format))
 	})
+
+	rand.Seed(time.Now().UnixNano())
 
 	for {
 		time.Sleep(30 * time.Second)
 
 		n := time.Duration(rand.Int31n(20)+10) * time.Second
-		log.Println("业务代码，调整间隔", n)
+		log.Println("<-- 业务代码，调整间隔", n)
 		t.ChangeInterval(n)
 	}
 }
@@ -51,16 +53,16 @@ func (d *DynamicTicker) start(interval time.Duration, fn func(time.Time)) {
 	timer := time.NewTimer(interval)
 	defer timer.Stop()
 
-	log.Println("滴答开始，初始间隔为", interval)
+	log.Println("--> 滴答开始，初始间隔", interval)
 
 	for {
 		select {
 		case t := <-timer.C:
-			log.Println("滴答滴答，时间到", t.Format(Format))
+			log.Println("--> 滴答滴答，时间到🌶", t.Format(Format))
 			go fn(t)
 			timer.Reset(interval)
 		case ic := <-d.IntervalChange:
-			log.Println("滴答收到，间隔调整为", ic)
+			log.Println("--> 滴答收到，间隔调为", ic)
 			// Stop does not close the channel, to prevent a concurrent goroutine
 			// reading from the channel from seeing an erroneous "tick".
 			interval = ic
