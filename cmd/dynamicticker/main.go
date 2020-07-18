@@ -27,20 +27,16 @@ func main() {
 
 // DynamicTicker 定义动态间隔的滴答器结构.
 type DynamicTicker struct {
-	Interval       time.Duration
 	IntervalChange chan time.Duration
-	Fn             func(tickTime time.Time)
 }
 
 // NewDynamicTicker 创建一个新的动态滴答器.
 func NewDynamicTicker(interval time.Duration, fn func(time.Time)) *DynamicTicker {
 	d := &DynamicTicker{
-		Interval:       interval,
 		IntervalChange: make(chan time.Duration, 1),
-		Fn:             fn,
 	}
 
-	go d.start()
+	go d.start(interval, fn)
 
 	return d
 }
@@ -51,33 +47,23 @@ func (d *DynamicTicker) ChangeInterval(newInterval time.Duration) {
 }
 
 // start 开始周期性运行任务.
-func (d *DynamicTicker) start() {
-	ticker := time.NewTicker(d.Interval)
+func (d *DynamicTicker) start(interval time.Duration, fn func(time.Time)) {
+	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	log.Println("滴答要开始干活了，初始间隔为", d.Interval)
+	log.Println("滴答要开始干活了，初始间隔为", interval)
 
 	for {
 		select {
-		case t, ok := <-ticker.C:
-			if ok {
-				log.Println("滴答，时间到", t.Format(Format))
-				go d.Fn(t)
-			} else {
-				log.Println("管道歇菜了")
-			}
+		case t := <-ticker.C:
+			log.Println("滴答，时间到", t.Format(Format))
+			go fn(t)
 		case ic := <-d.IntervalChange:
-			if ic != d.Interval {
-				log.Println("收到，滴答间隔调整为", ic)
-				ticker.Stop()
-
-				if ic > 0 {
-					d.Interval = ic
-					ticker = time.NewTicker(ic)
-				}
-			} else {
-				log.Println("收到，滴答间隔还是", d.Interval)
-			}
+			log.Println("收到，滴答间隔调整为", ic)
+			// Stop does not close the channel, to prevent a concurrent goroutine
+			// reading from the channel from seeing an erroneous "tick".
+			ticker.Stop()
+			ticker = time.NewTicker(ic)
 		}
 	}
 }
