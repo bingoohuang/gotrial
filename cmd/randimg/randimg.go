@@ -16,6 +16,7 @@ var (
 	picfmt    string
 	fixedSize uint64
 	many      int
+	fastMode  bool
 )
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
 	fixedSizeStr := flag.String("s", "", "fixed size(eg. 44kB, 17MB)")
 	flag.IntVar(&many, "i", 1, "how many pictures to create")
 	flag.StringVar(&picfmt, "f", "png", "picture format(png/jpg)")
+	flag.BoolVar(&fastMode, "fast", false, "fast mode")
 
 	flag.Parse()
 
@@ -44,7 +46,15 @@ func main() {
 	for i := 0; i < many; i++ {
 		randText := fmt.Sprintf("%d", s+i)
 		fileName := fmt.Sprintf("%d.%s", s+i, picfmt)
-		randimg.GenerateRandomImageFile(width, height, randText, fileName, int64(fixedSize))
+		c := randimg.RandImageConfig{
+			Width:      width,
+			Height:     height,
+			RandomText: randText,
+			FileName:   fileName,
+			FixedSize:  int64(fixedSize),
+			FastMode:   fastMode,
+		}
+		c.GenerateFile()
 
 		fmt.Println(fileName, "with ", width, "x", height, "randText", randText,
 			"size", humanize.IBytes(fixedSize), "generated!")
