@@ -1,4 +1,6 @@
-小改动，大提升Go标准库的一次优化 https://colobu.com/2019/12/31/small-changes-big-improvement/ 2019年的收尾之作。
+# 小改动，大提升Go标准库的一次优化
+
+[blog](https://colobu.com/2019/12/31/small-changes-big-improvement/) 2019年的收尾之作。
 
 Carlo Alberto Ferraris提交了一个对math/rand库中的lockedSource优化的pr[CL#191538](https://go-review.googlesource.com/c/go/+/191538),核心代码其实只有一行，却带来了相对的巨大的性能提升，让我们一起老看看这次的修改，学习一下代码的优化技巧，提高我们Go语言的底层优化经验。
 
